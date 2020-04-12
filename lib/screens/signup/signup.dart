@@ -1,3 +1,4 @@
+import 'package:armanogroup/screens/signup/widgets/MyButton.dart';
 import 'package:armanogroup/screens/signup/widgets/PasswordTextField.dart';
 import 'package:armanogroup/screens/signup/widgets/TextField.dart';
 import 'package:armanogroup/utills/MyColors.dart';
@@ -183,44 +184,7 @@ class _SignupState extends State<Signup> {
             ),
             Positioned(
               bottom: 0,
-              child: Container(
-
-
-                width: MediaQuery.of(context).size.width,
-
-
-                height: MediaQuery.of(context).size.height/12,
-                child: InkWell(
-                  onTap: (){
-                    _formKey.currentState.validate();
-
-                    print("clicked registrations");
-                  },
-                  splashColor: Colors.green,
-                  child: Card(
-
-
-                      semanticContainer: true,
-
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      color: MyColors.background_red,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30.0),
-                          topRight: Radius.circular(30.0))),
-                      child:Container(
-                        decoration: BoxDecoration(
-                            image:  DecorationImage(
-                              image: AssetImage("assets/images/button_red_background.png"),
-                              fit: BoxFit.cover,
-                            )
-                        ),
-                        child: Center(child: Text("Create Account",style: TextStyle(fontSize: 20,color: Colors.white),)),
-                      )
-
-
-                  ),
-                ),
-              ),
+              child: MyButtonRed(Data(0,0,0,0,"Create an Account",null))
             ),
           ],
         ),

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "911075704735",
+    "firebase_url": "https://armanogroup-64472.firebaseio.com",
+    "project_id": "armanogroup-64472",
+    "storage_bucket": "armanogroup-64472.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:911075704735:android:dc836179cd3e40e3d007aa",
+        "android_client_info": {
+          "package_name": "com.armanogroup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "911075704735-gcf8cp2j9fbsq22f0spfdetmp893ee54.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQuH4MZAr99cET467Y-IU5maxHCB8FKOY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "911075704735-gcf8cp2j9fbsq22f0spfdetmp893ee54.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "911075704735-58lso5pp70o2rcjvmf8vmogrmq36nrkq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.armanogroup"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

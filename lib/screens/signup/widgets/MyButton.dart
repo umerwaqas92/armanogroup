@@ -1,15 +1,24 @@
 import 'package:armanogroup/utills/MyColors.dart';
 import 'package:flutter/material.dart';
 
-class MyButton extends StatefulWidget {
+class MyButtonRed extends StatefulWidget {
+
+  Data data;
+
+
+  MyButtonRed(this.data);
+
   @override
-  _MyButtonState createState() => _MyButtonState();
+  _MyButtonRedState createState() => _MyButtonRedState(data);
 }
 
-class _MyButtonState extends State<MyButton> {
+class _MyButtonRedState extends State<MyButtonRed> {
+
+  Data data ;
 
 
-  
+  _MyButtonRedState(this.data);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +34,7 @@ class _MyButtonState extends State<MyButton> {
 
           print("clicked registrations");
         },
-        splashColor: Colors.green,
+        splashColor: Colors.white,
         child: Card(
 
 
@@ -34,8 +43,11 @@ class _MyButtonState extends State<MyButton> {
             clipBehavior: Clip.antiAliasWithSaveLayer,
             color: MyColors.background_red,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30.0),
-                topRight: Radius.circular(30.0))),
+              bottomRight:  Radius.circular(data.bottomRight),
+                bottomLeft: Radius.circular(data.bottomRight) ,
+                topLeft: Radius.circular(data.topLeft),
+                topRight: Radius.circular(data.topRight))),
+
             child:Container(
               decoration: BoxDecoration(
                   image:  DecorationImage(
@@ -43,7 +55,18 @@ class _MyButtonState extends State<MyButton> {
                     fit: BoxFit.cover,
                   )
               ),
-              child: Center(child: Text("Create Account",style: TextStyle(fontSize: 20,color: Colors.white),)),
+              child: Center(child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Icon(
+                    data.ico,
+                    color: Colors.white,
+                  ),
+                  Text(data.title,style: TextStyle(fontSize: 20,color: Colors.white),),
+
+                ],
+              )),
             )
 
 
@@ -51,4 +74,15 @@ class _MyButtonState extends State<MyButton> {
       ),
     );
   }
+}
+
+class Data{
+  double topLeft,topRight,bottomLeft,bottomRight;
+  String title;
+  IconData ico;
+
+  Data(this.topLeft, this.topRight, this.bottomLeft, this.bottomRight,
+      this.title, this.ico);
+
+
 }

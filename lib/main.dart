@@ -1,3 +1,4 @@
+import 'package:armanogroup/screens/home_dashboard/home_screen.dart';
 import 'package:armanogroup/screens/login/login.dart';
 import 'package:armanogroup/screens/signup/signup.dart';
 import 'package:armanogroup/screens/splash_screen.dart';
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
 
         primarySwatch: Colors.blue,
       ),
-      home: Signup(),
+      home: HomeDashBoard(),
     );
   }
 }
