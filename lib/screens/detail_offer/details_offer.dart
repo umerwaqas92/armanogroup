@@ -1,6 +1,10 @@
+import 'package:armanogroup/screens/login/login.dart';
+import 'package:armanogroup/screens/offer_make/offer_make.dart';
 import 'package:armanogroup/screens/signup/widgets/MyButton.dart';
 import 'package:armanogroup/utills/MyColors.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:solid_bottom_sheet/solid_bottom_sheet.dart';
 
 class DetailOffer extends StatefulWidget {
 
@@ -18,14 +22,29 @@ class _DetailOfferState extends State<DetailOffer> {
 
 
   _DetailOfferState(this.data);
+  SolidController _controller = SolidController();
+
 
   @override
   Widget build(BuildContext context) {
     var size=MediaQuery.of(context).size;
     final double imgheight=size.height/2.5;
 
+    print("services lenght"+data.services.length.toString());
+
 
     return Scaffold(
+
+//      bottomSheet: SolidBottomSheet(
+//        headerBar: null,
+//        body: MakeOffer(),
+//        showOnAppear: true,
+//        maxHeight: 400,
+//        draggableBody: true,
+//        key: Key("bottom"),
+//
+//
+//      ),
 
 
       body: Container(
@@ -147,7 +166,33 @@ class _DetailOfferState extends State<DetailOffer> {
                                   Container(
                                     width: size.width-100,
                                     child: Text(data.desc,style: TextStyle(color: MyColors.background_white,fontSize: 11,decoration: TextDecoration.none),),
-                                  )
+
+
+                                  ),
+                                 Container(
+
+                                   width: size.width,
+                                   height: 200,
+                                   child: ListView.builder(
+                                     shrinkWrap: true,
+                                       itemCount: data.services.length,
+
+                                       itemBuilder: (c,i){
+
+                                    return Container(
+                                      padding: EdgeInsets.fromLTRB(50, 0, 10, 0),
+
+                                       width: size.width,
+                                       height: 30,
+                                       child: Row(
+
+                                         children: <Widget>[
+                                           Icon(Icons.check_circle,color: MyColors.background_white,), SizedBox(width: 10,),Text(data.services[i].toString(),style: TextStyle(color: Colors.white),)
+                                         ],
+                                       ),
+                                     );
+                                   }),
+                                 )
                                 ],
                               ))
                         ],
@@ -161,13 +206,35 @@ class _DetailOfferState extends State<DetailOffer> {
                 ),
 
               ),
+
+
+
               Positioned(
                 bottom: -10
                 ,
-                child: Container(
-                    width: size.width,
-                    height: 100,
-                    child: MyButtonRed(Data(40,40,0,0,"Make an Offer",Icons.new_releases))),
+                child: InkWell(
+
+                  child: Container(
+                      width: size.width,
+                      height: 80,
+                      child: MyButtonRed(Data(40,40,0,0,"Make an Offer",Icons.new_releases,() async {
+                        if(await FirebaseAuth.instance.currentUser()==null){
+                        Navigator.pop(context);
+
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Login()),
+                        );
+                        }else{
+                          _controller.show();
+
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MakeOffer(data)),
+                        );
+                        }
+                      }))),
+                ),
               )
 
             ],

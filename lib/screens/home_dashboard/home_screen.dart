@@ -1,7 +1,8 @@
+import 'package:armanogroup/screens/chat_screen.dart';
 import 'package:armanogroup/screens/detail_offer/details_offer.dart';
 import 'package:armanogroup/screens/splash_screen.dart';
 import 'package:armanogroup/utills/MyColors.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
@@ -10,6 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 
 class HomeDashBoard extends StatefulWidget {
+
+  static  FirebaseUser user;
+
   @override
   _HomeDashBoardState createState() => _HomeDashBoardState();
 }
@@ -22,6 +26,12 @@ class HomeDashBoard extends StatefulWidget {
 
 class _HomeDashBoardState extends State<HomeDashBoard> {
   List<OfferData> offers=List();
+
+  Future<void> getuserid() async {
+    HomeDashBoard.user=await FirebaseAuth.instance.currentUser();
+    print("user id"+HomeDashBoard.user.uid);
+  }
+
 
 
 
@@ -47,17 +57,30 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
 
   }
 
+  Image myImage;
+
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    myImage= Image.asset("assets/images/dummy_image_square.jpg");
 
     getServices();
+    getuserid();
 
 
 
 
 
+  }
+
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    precacheImage(myImage.image, context);
   }
 
 
@@ -146,6 +169,10 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
 
                             }),
                             buildNavigationBtn("Chat",Icons.message,MyColors.background_white,(){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ChatScreen()),
+                              );
 
                             }),
                             buildNavigationBtn("Account",Icons.person,MyColors.background_white,(){
@@ -193,11 +220,12 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
                           child: Container(
 
 
+
                             decoration: BoxDecoration(
-                              image:DecorationImage(
-                                image: NetworkImage(data.img),
-                                fit: BoxFit.cover,
-                              ),
+//                              image:DecorationImage(
+//                                image: NetworkImage(data.img),
+//                                fit: BoxFit.cover,
+//                              ),
                               borderRadius: BorderRadius.only(
 
                                 topRight: Radius.circular(30),
@@ -215,7 +243,26 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
 
 
                             ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.only(
+
+                                topRight: Radius.circular(30),
+                                topLeft: Radius.circular(30),
+                              ),
+
+
+                              child: FadeInImage(
+
+                                width: MediaQuery.of(context).size.width,
+
+
+                                image: data==null?NetworkImage(data.img):AssetImage("assets/images/dummy_image_square.jpg"),
+                                fit: BoxFit.cover,
+                                placeholder: AssetImage("assets/images/dummy_image_square.jpg"),
+                              ),
+                            ),
                           ),
+
 
                       ),
                     ),

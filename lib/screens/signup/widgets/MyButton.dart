@@ -24,16 +24,12 @@ class _MyButtonRedState extends State<MyButtonRed> {
     return Container(
 
 
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width+20,
 
 
       height: MediaQuery.of(context).size.height/12,
       child: InkWell(
-        onTap: (){
-
-
-          print("clicked registrations");
-        },
+        onTap: data.func,
         splashColor: Colors.white,
         child: Card(
 
@@ -80,9 +76,11 @@ class Data{
   double topLeft,topRight,bottomLeft,bottomRight;
   String title;
   IconData ico;
+  Function func;
+
 
   Data(this.topLeft, this.topRight, this.bottomLeft, this.bottomRight,
-      this.title, this.ico);
+      this.title, this.ico,this.func);
 
 
 }

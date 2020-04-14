@@ -1,5 +1,11 @@
+import 'package:armanogroup/screens/home_dashboard/home_screen.dart';
+import 'package:armanogroup/screens/signup/signup.dart';
+import 'package:armanogroup/screens/signup/widgets/PasswordTextField.dart';
+import 'package:armanogroup/screens/signup/widgets/TextField.dart';
 import 'package:armanogroup/utills/MyColors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -9,12 +15,26 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
 
 
+  bool isloading=false;
+
+  final _formKey = GlobalKey<FormState>();
+  String _password="";
+  String _email="";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       resizeToAvoidBottomPadding: false,
-      body: Container(
+      body: isloading?Container(
+          color: MyColors.background_white,
+          child:SpinKitSquareCircle(
+            color: MyColors.background_red,
+            size: 50.0,
+
+
+          )
+      ): Container(
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("assets/images/splash_screen.png"),
@@ -60,39 +80,35 @@ class _LoginState extends State<Login> {
                                child: Container(
                                  padding: EdgeInsets.all(20),
                                  child: Form(
+                                   key: _formKey,
 
                                    child: Column(
                                      crossAxisAlignment: CrossAxisAlignment.start,
                                      children: <Widget>[
 
                                        SizedBox(height: 100),
-                                       TextField(
-                                           decoration: InputDecoration(
-                                               enabledBorder:  OutlineInputBorder(
-                                                 borderSide:  BorderSide(color:MyColors.dark_bloe1, width: 1.0),
-                                               ),
-                                               focusedBorder:  OutlineInputBorder(
-                                                 borderSide:  BorderSide(color: MyColors.background_red, width: 1.0),
-                                               ),
-                                               labelText: "Email Adress",
-                                               hintText: "XXXX@gmail.com"
 
-                                           )
-                                       ),
-                                       SizedBox(height: 20),
-                                       TextField(
-                                           decoration: InputDecoration(
-                                               enabledBorder:  OutlineInputBorder(
-                                                 borderSide:  BorderSide(color:MyColors.dark_bloe1, width: 1.0),
-                                               ),
-                                               focusedBorder:  OutlineInputBorder(
-                                                 borderSide:  BorderSide(color: MyColors.background_red, width: 1.0),
-                                               ),
-                                               labelText: "Email Adress",
-                                               hintText: "XXXX@gmail.com"
+                                       MYTextField("Email"," XXXX@gmail.com",TextInputType.emailAddress,(val){
+                                         _email=val;
 
-                                           )
-                                       ),
+                                       },(val){
+                                         if(val == ""){
+                                           return "Country must no eampty";
+                                         }
+                                       },1,""),
+
+                                       SizedBox(height: 10),
+
+
+                                       MYTextFieldPassword("Password"," ",TextInputType.visiblePassword,(val){
+                                         _password=val;
+
+                                       },(val){
+                                         if(val == ""){
+                                           return "Password must no emapty";
+                                         }
+                                       },),
+                                       SizedBox(height: 10),
 
                                      ],
                                    ),
@@ -113,24 +129,51 @@ class _LoginState extends State<Login> {
 
 
                            height: 80,
-                           child: Card(
-                               semanticContainer: true,
-                               clipBehavior: Clip.antiAliasWithSaveLayer,
-                               color: MyColors.background_red,
-                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(
-                                   bottomLeft: Radius.circular(30.0),
-                                   bottomRight: Radius.circular(30.0))),
-                               child:Container(
-                                 decoration: BoxDecoration(
-                                     image:  DecorationImage(
-                                       image: AssetImage("assets/images/button_red_background.png"),
-                                       fit: BoxFit.cover,
-                                     )
-                                 ),
-                                 child: Center(child: Text("Login",style: TextStyle(fontSize: 20,color: Colors.white),)),
-                               )
+                           child: InkWell(
+                             onTap: () async {
+
+                               try{
+                                 print("trying to login...");
+                                 _formKey.currentState.save();
+
+                                 setState(() {
+                                   isloading=true;
+                                 });
+                                 var use= await FirebaseAuth.instance.signInWithEmailAndPassword(email: _email, password: _password);
+
+                                 Navigator.pop(context);
+
+                                 Navigator.push(
+                                   context,
+                                   MaterialPageRoute(builder: (context) => HomeDashBoard()),
+                                 );
+
+                               }catch(er){
+                                 setState(() {
+                                   isloading=false;
+                                 });
+                               }
+
+                             },
+                             child: Card(
+                                 semanticContainer: true,
+                                 clipBehavior: Clip.antiAliasWithSaveLayer,
+                                 color: MyColors.background_red,
+                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.only(
+                                     bottomLeft: Radius.circular(30.0),
+                                     bottomRight: Radius.circular(30.0))),
+                                 child:Container(
+                                   decoration: BoxDecoration(
+                                       image:  DecorationImage(
+                                         image: AssetImage("assets/images/button_red_background.png"),
+                                         fit: BoxFit.cover,
+                                       )
+                                   ),
+                                   child: Center(child: Text("Login",style: TextStyle(fontSize: 20,color: Colors.white),)),
+                                 )
 
 
+                             ),
                            ),
                          ),
 
@@ -154,6 +197,10 @@ class _LoginState extends State<Login> {
                 child: InkWell(
                   onTap: (){
                     print("clicked registrations");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Signup()),
+                    );
                   },
                   splashColor: Colors.green,
                   child: Card(
