@@ -21,6 +21,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
 
   TextEditingController _controller=TextEditingController();
+  ScrollController _controllerScroll=ScrollController();
   bool issending=false;
 
 
@@ -37,12 +38,19 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
 
+  Future<DocumentSnapshot> getbubble(snapshot) async {
+  var ss=  await snapshot["offer"].get();
+//      print(ss["service"]);
+
+      return ss;
+  }
+
 
   @override
   Widget build(BuildContext context) {
 
 
-    var size=MediaQuery.of(context).size;
+   final  size=MediaQuery.of(context).size;
     final header_heoght=size.height/8;
     final navigation=size.height/14;
     String _msg="";
@@ -96,7 +104,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
 
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(2.0),
                   child: TextField(
                     controller: _controller,
                     onChanged: (val){
@@ -126,13 +134,21 @@ class _ChatScreenState extends State<ChatScreen> {
 //                          _controller.selection();
                         print("sending messages to...."+_msg);
                           var user=await FirebaseAuth.instance.currentUser();
+//                          setState(() {
+//                            issending=true;
+//
+//                          });
+
+
+
+
+                          _controller.clear();
                           setState(() {
-                            issending=true;
+
+//                            });
 
                           });
-
-
-
+                          _controllerScroll.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeInOut);
 
                          await Firestore.instance.collection("conversations").document(user.uid)
                               .collection("messages").document().setData({
@@ -151,7 +167,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           },merge: true);
                        await Firestore.instance.collection("conversations").document(user.uid)
                             .setData({
-                          "last_content":_msg,
+                          "last_content":_msg.replaceAll(".", ","),
                           "time":FieldValue.serverTimestamp(),
 
 
@@ -167,7 +183,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         },merge: true);
 //                          _controller.clear();
 //                          Timer(Duration(milliseconds: 100),(){
-                            _controller.clear();
+
                             setState(() {
                               issending=false;
 //                            });
@@ -210,20 +226,23 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Container(
                 width: size.width,
                 height: size.height,
+
                 child: StreamBuilder(
+
                   stream: Firestore.instance
                       .collection('conversations')
                       .document(HomeDashBoard.user.uid)
                       .collection("messages")
                       .orderBy('time', descending: true)
-                      .limit(20)
+                      .limit(50)
                       .snapshots(),
 
 
                   builder: (c, snap){
                     if (snap.hasData){
                      var list =snap.data.documents;
-                     return ListView.builder(
+                     return ListView.builder (
+                       controller:_controllerScroll,
                        reverse: true,
 
 
@@ -231,20 +250,90 @@ class _ChatScreenState extends State<ChatScreen> {
                        itemBuilder: (context,i){
                          DocumentSnapshot snapshot=snap.data.documents[i];
                          bool ismine=(HomeDashBoard.user.uid==snapshot["from"]);
+                         int type=snapshot["type"];
+
+                         if(type==1){
+                           ///offer
+                           ///
+                           ///
+
+//                           snapshot["offer"].get().then();
+
+                           try{
+                             return  FutureBuilder(
+                                 future:getbubble(snapshot),
+                                 builder:(ii,offersnaps) {
+                                   if(offersnaps.hasData){
+                                   return Bubble(
+                                     radius:Radius.circular(20),
+                                     padding: BubbleEdges.all(0),
+                                     margin: BubbleEdges.only(top: 10),
+
+                                     alignment: ismine?Alignment.centerRight:Alignment.centerLeft,
+                                     color:Colors.white70,
+                                     child: Container(
+
+                                         width: size.width/2,
+                                         height: size.height/2,
+                                         child: Stack(
+                                           children: <Widget>[
+
+                                             Positioned(
+                                               top:0,
+                                               child: Container(
+                                                 color: MyColors.dark_bloe1,
+
+                                                 child: Center(child: Text(offersnaps.data["service"], textAlign: ismine?TextAlign.left:TextAlign.right, style: TextStyle(color: MyColors.background_white,fontSize: 16.0,fontWeight: FontWeight.bold)))
+                                                 ,
+                                                 width: size.width/2,
+                                                 height: 70,
+                                               ),
+                                             ),
+                                             Positioned(
+                                               top: 75,
+                                               child: Container(
+                                                 padding: EdgeInsets.all(10),
+                                                 width: size.width/2,
+                                                 child:  SingleChildScrollView(
+                                                   child: Text(offersnaps.data["desc"], textAlign: ismine?TextAlign.left:TextAlign.right, style: TextStyle(color: MyColors.dark_bloe1,fontSize: 13.0,)),
+
+                                                 )
+                                               ),
+                                             ),
+                                             Positioned(
+                                               bottom:0,
+                                               child: Container(
+                                                 color: MyColors.background_red
+
+                                                 ,
+                                                 width: size.width/2,
+                                                 height: 70,
+                                               ),
+                                             ),
+                                           ],
+                                         )),
+                                   );}else{
+                                     return Container(
+
+                                     );
+                                   }
+                                 }
+                             );
+                           }catch(e){
+
+                           }
+                         }
 
 
                          return Container(
 
-
-
-
-
                               child: Bubble(
-                                margin: BubbleEdges.only(top: 10),
+                                padding: BubbleEdges.all(10),
+                                margin: BubbleEdges.only(top: 20),
                                 nip: ismine?BubbleNip.rightTop:BubbleNip.leftTop,
                                 alignment: ismine?Alignment.centerRight:Alignment.centerLeft,
                                 color:MyColors.background_white.withAlpha(30),
-                                child: Text(snapshot["content"], textAlign: ismine?TextAlign.left:TextAlign.right, style: TextStyle(color: MyColors.background_white,fontSize: 16.0,wordSpacing: 10)),
+                                child: SelectableText(snapshot["content"].toString().replaceAll(",", "."), textAlign: ismine?TextAlign.left:TextAlign.right, style: TextStyle(color: MyColors.background_white,fontSize: 15.0,)),
                               ),
 
 
@@ -263,7 +352,14 @@ class _ChatScreenState extends State<ChatScreen> {
                      );
 
                     }else{
-                      return Text("No data");
+                      return  Container(
+
+                          child:SpinKitSquareCircle(
+                          color: MyColors.background_red,
+                          size: 50.0,
+
+
+                      ));
                     }
                   },
                 ),
@@ -281,7 +377,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Row(mainAxisAlignment:MainAxisAlignment.spaceBetween,children: <Widget>[IconButton(onPressed: (){
 
                     Navigator.pop(context);
-                  },icon: Icon(Icons.arrow_back,color: Colors.white,size: 20,),), Text("Chat",style: TextStyle(color: Colors.white,fontSize: 18),),Text("online  ",style: TextStyle(color: MyColors.background_red,fontSize: 14),)])),
+                  },icon: Icon(Icons.arrow_back,color: Colors.white,size: 20,),), Text("Chat",style: TextStyle(color: Colors.white,fontSize: 18),),Text("online  ",style: TextStyle(color: MyColors.background_red,fontSize: 14),),RaisedButton(
+                   onPressed: (){
+                     sentoffer();
+                   },
+
+                  )])),
 
             ),
 
@@ -290,6 +391,24 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
 
     );
+  }
+
+
+  void sentoffer(){
+     Firestore.instance.collection("conversations").document(HomeDashBoard.user.uid)
+        .collection("messages").document().setData({
+
+      "time":FieldValue.serverTimestamp(),
+      "type":1,
+      "status":0,
+      "from":HomeDashBoard.user.uid.toString(),
+      "read":0,
+      "offer":Firestore.instance.collection("offers").document("tfpbeql6yAe1kQlGxqRB"),
+
+
+
+
+    },merge: true);
   }
 
   Widget _circularContainer(double height, Color color,

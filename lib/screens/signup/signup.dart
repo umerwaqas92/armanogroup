@@ -232,6 +232,7 @@ class _SignupState extends State<Signup> {
                                             "email":email,
                                             "copmnyname":copmnyname,
                                             "photo":downloadurl,
+                                            "unreadmsg":0,
 
                                           });
 

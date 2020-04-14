@@ -60,6 +60,16 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
   Image myImage;
 
 
+  Future<DocumentSnapshot> getuser() async {
+    var user =await FirebaseAuth.instance.currentUser();
+   Firestore.instance.collection("users").document(user.uid).snapshots().listen((uu){
+      print("user "+uu["name"]);
+      return uu;
+    });
+
+  }
+
+
 
   @override
   void initState() {
@@ -107,9 +117,10 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
           children: <Widget>[
 
             Positioned(
+
               top: header_heoght-30,
               width: size.width,
-                height: size.height,
+                bottom: navigation,
 
                 child: ListView.builder(
                   shrinkWrap: true,
@@ -168,13 +179,71 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
                             buildNavigationBtn("Home",Icons.home,MyColors.background_red,(){
 
                             }),
-                            buildNavigationBtn("Chat",Icons.message,MyColors.background_white,(){
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => ChatScreen()),
-                              );
+                            Container(
 
-                            }),
+                              child: Stack(
+                                children: <Widget>[
+                                  buildNavigationBtn("Chat",Icons.message,MyColors.background_white,(){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => ChatScreen()),
+                                    );
+                                    Firestore.instance.collection("users").document(HomeDashBoard.user.uid).setData({
+                                      "unreadmsg":0,
+                                    },merge: true);
+
+
+
+
+
+                                  }),
+                                  Positioned(
+                                    right: 20,
+                                      top: 10,
+                                      child: Container(
+
+                                         child: StreamBuilder(
+                                           stream: Firestore.instance.collection("users").document(HomeDashBoard.user.uid).snapshots(),
+
+                                           builder: (cc,snaps){
+                                             if(snaps.hasError){
+                                               print(snaps.error.toString());
+                                               return Container();
+                                             }
+                                             if(snaps.hasData){
+                                               DocumentSnapshot  snap=snaps.data;
+                                               if(snap["unreadmsg"]==0){
+                                                 return Container(
+
+                                                 );
+                                               }
+
+                                               return  Container(
+                                                 width: 20,
+                                                   height: 20,
+                                                   padding: EdgeInsets.all(2),
+                                                   decoration: new BoxDecoration(
+                                                     color: Colors.red,
+                                                     borderRadius: BorderRadius.circular(6),
+                                                   ),
+                                                   constraints: BoxConstraints(
+                                                     minWidth: 12,
+                                                     minHeight: 12,
+                                                   )
+                                                   ,child: Text(snap["unreadmsg"].toString(),style: TextStyle(color:Colors.white,fontSize: 11,),textAlign: TextAlign.center,));
+
+                                             }else{
+                                               return Container();
+                                             }
+
+
+                                           },
+                                         )
+
+                                      ))
+                                ],
+                              ),
+                            ),
                             buildNavigationBtn("Account",Icons.person,MyColors.background_white,(){
 
                             }),
@@ -198,7 +267,7 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
 
 
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(20.0),
       child: Wrap(
                 children: <Widget>[
                   InkWell(
@@ -237,7 +306,7 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
 
                               boxShadow: [
                                 new BoxShadow(
-                                  color: Colors.black87,
+                                  color: Colors.black12,
                                   blurRadius: 10.0,
                                 ),],
 
@@ -256,7 +325,7 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
                                 width: MediaQuery.of(context).size.width,
 
 
-                                image: data==null?NetworkImage(data.img):AssetImage("assets/images/dummy_image_square.jpg"),
+                                image: data!=null?NetworkImage(data.img):AssetImage("assets/images/dummy_image_square.jpg"),
                                 fit: BoxFit.cover,
                                 placeholder: AssetImage("assets/images/dummy_image_square.jpg"),
                               ),
@@ -308,24 +377,27 @@ class _HomeDashBoardState extends State<HomeDashBoard> {
                             Positioned(
                               top: 30,
                               right: 30,
-                              child: Text("View more",style: TextStyle(color: MyColors.background_white,decoration: TextDecoration.none))
+                              child: Text("View more",style: TextStyle(color: MyColors.background_red,decoration: TextDecoration.none))
                             ),
                             Positioned(
                               top: 20,
                               left: 30,
 
-                              child: Column(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width/2,
+                                child: Column(
 
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    data.title,style: TextStyle(color: MyColors.background_white,fontSize: 20,decoration: TextDecoration.none),
-                                  ),
-                                  SizedBox(height: 8,),
-                                  Text(
-                                    data.purchased.toString()+"+ Purchased",style: TextStyle(color: Colors.white70,fontSize: 11,decoration: TextDecoration.none),
-                                  ),
-                                ],
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      data.title.toUpperCase(), overflow: TextOverflow.ellipsis,style: TextStyle(color: MyColors.background_white,fontSize: 20,decoration: TextDecoration.none),
+                                    ),
+                                    SizedBox(height: 8,),
+                                    Text(
+                                      data.purchased.toString()+"+ Purchased",style: TextStyle(color: Colors.white70,fontSize: 11,decoration: TextDecoration.none),
+                                    ),
+                                  ],
+                                ),
                               ),
                             )
                           ],
